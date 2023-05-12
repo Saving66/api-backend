@@ -1,7 +1,8 @@
 package com.yupi.springbootinit.common;
 
-import java.io.Serializable;
 import lombok.Data;
+
+import java.io.Serializable;
 
 /**
  * 删除请求
@@ -10,7 +11,7 @@ import lombok.Data;
  * @from <a href="https://yupi.icu">编程导航知识星球</a>
  */
 @Data
-public class DeleteRequest implements Serializable {
+public class IdRequest implements Serializable {
 
     /**
      * id

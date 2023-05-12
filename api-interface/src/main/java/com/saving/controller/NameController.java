@@ -39,6 +39,10 @@ public class NameController {
             throw new RuntimeException("无权限");
         }
 
+        if (System.currentTimeMillis() - Long.parseLong(timestamp) > 1000 * 60 * 5) {
+            throw new RuntimeException("无权限");
+        }
+
         String json = JSONUtil.toJsonStr(user);
         if (!sign.equals(SignUtil.genSign(json, "abcdefgh"))) {
             throw new RuntimeException("无权限");

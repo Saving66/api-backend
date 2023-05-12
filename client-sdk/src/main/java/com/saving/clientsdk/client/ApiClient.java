@@ -7,14 +7,11 @@ import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONUtil;
 import com.saving.clientsdk.model.entry.User;
 import com.saving.clientsdk.utils.SignUtil;
-import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Timer;
 
-@Component
+
 public class ApiClient {
 
     private String accessKey;

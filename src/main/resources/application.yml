@@ -42,7 +42,7 @@ spring:
       max-file-size: 10MB
 server:
   address: 0.0.0.0
-  port: 8101
+  port: 7529
   servlet:
     context-path: /api
     # cookie 30 天过期
@@ -87,3 +87,8 @@ cos:
     secretKey: xxx
     region: xxx
     bucket: xxx
+
+api:
+  client:
+    access-key: saving
+    secret-key: abcdefgh

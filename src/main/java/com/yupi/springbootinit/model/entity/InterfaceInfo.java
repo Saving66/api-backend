@@ -1,12 +1,10 @@
 package com.yupi.springbootinit.model.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
+import lombok.Data;
+
 import java.io.Serializable;
 import java.util.Date;
-import lombok.Data;
 
 /**
  * 接口信息
@@ -15,6 +13,7 @@ import lombok.Data;
 @TableName(value ="interface_info")
 @Data
 public class InterfaceInfo implements Serializable {
+
     /**
      * 主键
      */
@@ -57,6 +56,11 @@ public class InterfaceInfo implements Serializable {
     private String method;
 
     /**
+     * 请求参数
+     */
+    private String requestParams;
+
+    /**
      * 创建人
      */
     private Long userId;
@@ -74,6 +78,7 @@ public class InterfaceInfo implements Serializable {
     /**
      * 是否删除(0-未删, 1-已删)
      */
+    @TableLogic
     private Integer isDelete;
 
     @TableField(exist = false)

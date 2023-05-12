@@ -6,7 +6,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
 
 
 @Configuration
@@ -19,7 +18,7 @@ public class ClientConfig {
 
     private String secretKey;
 
-    @Bean
+    @Bean(name = "apiClient2")
     public ApiClient apiClient() {
         return new ApiClient(accessKey, secretKey);
     }
