@@ -1,5 +1,8 @@
 package com.yupi.springbootinit.model.dto.interfaceInfo;
 
+import com.yupi.springbootinit.utils.RequestHeader;
+import com.yupi.springbootinit.utils.RequestParam;
+import com.yupi.springbootinit.utils.ResponseHeader;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -14,20 +17,41 @@ import java.util.List;
 @Data
 public class InterfaceInfoAddRequest implements Serializable {
 
-    /**
-     * 标题
-     */
-    private String title;
 
     /**
-     * 内容
+     * 接口名称
      */
-    private String content;
+    private String name;
 
     /**
-     * 标签列表
+     * 接口地址
      */
-    private List<String> tags;
+    private String url;
+
+    /**
+     * 描述
+     */
+    private String description;
+
+    /**
+     * 请求头
+     */
+    private List<RequestHeader> requestHeaders;
+
+    /**
+     * 响应头
+     */
+    private List<ResponseHeader> responseHeaders;
+
+    /**
+     * 请求类型
+     */
+    private String method;
+
+    /**
+     * 请求参数
+     */
+    private List<RequestParam> requestParams;
 
     private static final long serialVersionUID = 1L;
 }

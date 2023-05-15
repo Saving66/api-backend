@@ -6,16 +6,13 @@ import com.google.gson.Gson;
 import com.saving.clientsdk.client.ApiClient;
 import com.yupi.springbootinit.annotation.AuthCheck;
 import com.yupi.springbootinit.common.BaseResponse;
-import com.yupi.springbootinit.common.IdRequest;
 import com.yupi.springbootinit.common.ErrorCode;
+import com.yupi.springbootinit.common.IdRequest;
 import com.yupi.springbootinit.common.ResultUtils;
 import com.yupi.springbootinit.constant.UserConstant;
 import com.yupi.springbootinit.exception.BusinessException;
 import com.yupi.springbootinit.exception.ThrowUtils;
-import com.yupi.springbootinit.model.dto.interfaceInfo.InterfaceInfoAddRequest;
-import com.yupi.springbootinit.model.dto.interfaceInfo.InterfaceInfoEditRequest;
-import com.yupi.springbootinit.model.dto.interfaceInfo.InterfaceInfoQueryRequest;
-import com.yupi.springbootinit.model.dto.interfaceInfo.InterfaceInfoUpdateRequest;
+import com.yupi.springbootinit.model.dto.interfaceInfo.*;
 import com.yupi.springbootinit.model.entity.InterfaceInfo;
 import com.yupi.springbootinit.model.entity.User;
 import com.yupi.springbootinit.model.vo.InterfaceInfoVO;
@@ -29,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Map;
 
 import static com.yupi.springbootinit.constant.CommonConstant.SORT_ORDER_ASC;
 
@@ -69,14 +67,10 @@ public class InterfaceIntoController {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         InterfaceInfo interfaceInfo = new InterfaceInfo();
-        BeanUtils.copyProperties(interfaceInfoAddRequest, interfaceInfo);
+        BeanUtils.copyProperties(interfaceInfoAddRequest, interfaceInfo, "requestParams", "requestHeader", "responseHeader");
         interfaceInfoService.validInterfaceInfo(interfaceInfo, true);
-        User loginUser = userService.getLoginUser(request);
-        interfaceInfo.setUserId(loginUser.getId());
-        boolean result = interfaceInfoService.save(interfaceInfo);
-        ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
-        long newInterfaceInfoId = interfaceInfo.getId();
-        return ResultUtils.success(newInterfaceInfoId);
+        Long interfaceInfoId = interfaceInfoService.addInterfaceInfo(interfaceInfo, interfaceInfoAddRequest, request);
+        return ResultUtils.success(interfaceInfoId);
     }
 
 
@@ -316,6 +310,44 @@ public class InterfaceIntoController {
 //        }
 //        boolean result = interfaceInfoService.updateById(interfaceInfo);
 //        return ResultUtils.success(result);
+        return null;
+    }
+
+    /**
+     * 调用接口
+     * TODO
+     * @param invokeRequest
+     * @return
+     */
+    @PostMapping("/invoke")
+    public BaseResponse<InterfaceInfo> invokeInterfaceInfo(@RequestBody InterfaceInfoInvokeRequest invokeRequest) {
+        // 1.判断请求信息是否合理
+        Long userId = invokeRequest.getUserId();
+        Map<String, String> requestHeader = invokeRequest.getRequestHeader();
+        String requestParams = invokeRequest.getRequestParams();
+        String url = invokeRequest.getUrl();
+        String method = invokeRequest.getMethod();
+        if (userId == null || StringUtils.isAnyBlank(requestParams, url, method)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        if (userId <= 0) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        // 2.判断接口是否存在
+//        InterfaceInfo interfaceInfo = interfaceInfoService.getById();
+//        if (interfaceInfo == null) {
+//            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
+//        }
+        // 3.判断接口是否可以可以调用
+        com.saving.clientsdk.model.entry.User user = new com.saving.clientsdk.model.entry.User("test");
+        String name = client.getNameByRestful(user);
+        if (StringUtils.isBlank(name)) {
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR);
+        }
+        // 4.上线
+//        interfaceInfo.setStatus(1);
+//        boolean update = interfaceInfoService.updateById(interfaceInfo);
+//        return update == true ? ResultUtils.success(interfaceInfo) : ResultUtils.error(ErrorCode.OPERATION_ERROR);
         return null;
     }
 

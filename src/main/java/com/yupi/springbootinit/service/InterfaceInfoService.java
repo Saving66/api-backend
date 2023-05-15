@@ -1,8 +1,10 @@
 package com.yupi.springbootinit.service;
 
-import com.yupi.springbootinit.model.entity.InterfaceInfo;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.yupi.springbootinit.model.dto.interfaceInfo.InterfaceInfoAddRequest;
 import com.yupi.springbootinit.model.entity.InterfaceInfo;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
 * @author saving
@@ -18,4 +20,6 @@ public interface InterfaceInfoService extends IService<InterfaceInfo> {
      * @param add
      */
     void validInterfaceInfo(InterfaceInfo interfaceInfo, boolean add);
+
+    Long addInterfaceInfo(InterfaceInfo interfaceInfo, InterfaceInfoAddRequest interfaceInfoAddRequest, HttpServletRequest request);
 }
