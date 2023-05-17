@@ -1,8 +1,8 @@
 package com.yupi.springbootinit.model.dto.interfaceInfo;
 
-import com.yupi.springbootinit.utils.RequestHeader;
-import com.yupi.springbootinit.utils.RequestParam;
-import com.yupi.springbootinit.utils.ResponseHeader;
+import com.yupi.springbootinit.model.entity.RequestHeader;
+import com.yupi.springbootinit.model.entity.RequestParam;
+import com.yupi.springbootinit.model.entity.ResponseHeader;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -36,12 +36,12 @@ public class InterfaceInfoAddRequest implements Serializable {
     /**
      * 请求头
      */
-    private List<RequestHeader> requestHeaders;
+    private List<RequestHeader> requestHeader;
 
     /**
      * 响应头
      */
-    private List<ResponseHeader> responseHeaders;
+    private List<ResponseHeader> responseHeader;
 
     /**
      * 请求类型

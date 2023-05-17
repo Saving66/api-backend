@@ -1,4 +1,4 @@
-package com.yupi.springbootinit.utils;
+package com.yupi.springbootinit.model.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

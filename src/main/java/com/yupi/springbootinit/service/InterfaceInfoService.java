@@ -22,4 +22,8 @@ public interface InterfaceInfoService extends IService<InterfaceInfo> {
     void validInterfaceInfo(InterfaceInfo interfaceInfo, boolean add);
 
     Long addInterfaceInfo(InterfaceInfo interfaceInfo, InterfaceInfoAddRequest interfaceInfoAddRequest, HttpServletRequest request);
+
+    boolean isVaildUse(InterfaceInfo interfaceInfo);
+
+    String invokeInterface(InterfaceInfo interfaceInfo, Long userId);
 }

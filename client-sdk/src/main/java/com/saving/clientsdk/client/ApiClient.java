@@ -67,9 +67,11 @@ public class ApiClient {
     public BaseResponse invokeApi(InvokeRequest invokeRequest) {
 
         // 1. 生成签名和请求头
-        Map<String, String> headerMap = getHeaderMap(String.valueOf(invokeRequest.getUserId()), invokeRequest.getRequestHeader());
+        String requestHeader = invokeRequest.getRequestHeader();
+        Map<String, String> map = JSONUtil.toBean(requestHeader, Map.class);
+        Map<String, String> headerMap2 = getHeaderMap(String.valueOf(invokeRequest.getUserId()), map);
         // 2. 发送请求
-        String method = invokeRequest.getMethod();
+        String method = invokeRequest.getMethod( );
         HttpRequest request;
         switch (method.toUpperCase()) {
             case "GET":
@@ -84,10 +86,9 @@ public class ApiClient {
             default:
                 throw new IllegalArgumentException("Invalid HTTP method: " + method);
         }
-
         String requestParams = invokeRequest.getRequestParams();
         String result = request
-                .addHeaders(headerMap)
+                .addHeaders(headerMap2)
                 .body(requestParams).execute().body();
         // 3. 返回结果
         return ResultUtils.success(result);

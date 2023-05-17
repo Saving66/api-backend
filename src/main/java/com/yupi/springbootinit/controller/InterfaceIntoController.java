@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
-import java.util.Map;
 
 import static com.yupi.springbootinit.constant.CommonConstant.SORT_ORDER_ASC;
 
@@ -157,7 +156,7 @@ public class InterfaceIntoController {
      */
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     @PostMapping("/online")
-    public BaseResponse<InterfaceInfo> onlineInterfaceInfoById(@RequestBody IdRequest id) {
+    public BaseResponse<InterfaceInfo> onlineInterfaceInfoById(@RequestBody IdRequest id, HttpServletRequest request) {
         // 1.判断请求信息是否合理
         if (id.getId() <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
@@ -168,9 +167,9 @@ public class InterfaceIntoController {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
         }
         // 3.判断接口是否可以可以调用
-        com.saving.clientsdk.model.entry.User user = new com.saving.clientsdk.model.entry.User("test");
-        String name = client.getNameByRestful(user);
-        if (StringUtils.isBlank(name)) {
+        User loginUser = userService.getLoginUser(request);
+        boolean vaildUse = interfaceInfoService.isVaildUse(interfaceInfo);
+        if (!vaildUse) {
             throw new BusinessException(ErrorCode.SYSTEM_ERROR);
         }
         // 4.上线
@@ -320,35 +319,28 @@ public class InterfaceIntoController {
      * @return
      */
     @PostMapping("/invoke")
-    public BaseResponse<InterfaceInfo> invokeInterfaceInfo(@RequestBody InterfaceInfoInvokeRequest invokeRequest) {
-        // 1.判断请求信息是否合理
-        Long userId = invokeRequest.getUserId();
-        Map<String, String> requestHeader = invokeRequest.getRequestHeader();
-        String requestParams = invokeRequest.getRequestParams();
-        String url = invokeRequest.getUrl();
-        String method = invokeRequest.getMethod();
-        if (userId == null || StringUtils.isAnyBlank(requestParams, url, method)) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR);
-        }
-        if (userId <= 0) {
+    public BaseResponse<String> invokeInterfaceInfo(@RequestBody InterfaceInfoUserInvokeRequest invokeRequest, HttpServletRequest request) {
+        // 1.判断请求参数是否合理
+        if (invokeRequest == null || "".equals(invokeRequest.getRequestParams())) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         // 2.判断接口是否存在
-//        InterfaceInfo interfaceInfo = interfaceInfoService.getById();
-//        if (interfaceInfo == null) {
-//            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
-//        }
-        // 3.判断接口是否可以可以调用
-        com.saving.clientsdk.model.entry.User user = new com.saving.clientsdk.model.entry.User("test");
-        String name = client.getNameByRestful(user);
-        if (StringUtils.isBlank(name)) {
-            throw new BusinessException(ErrorCode.SYSTEM_ERROR);
+        InterfaceInfo interfaceInfo = interfaceInfoService.getById(invokeRequest.getId());
+        if (interfaceInfo == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
         }
-        // 4.上线
-//        interfaceInfo.setStatus(1);
-//        boolean update = interfaceInfoService.updateById(interfaceInfo);
-//        return update == true ? ResultUtils.success(interfaceInfo) : ResultUtils.error(ErrorCode.OPERATION_ERROR);
-        return null;
+        // 3.判断接口是否下线
+        if (interfaceInfo.getStatus() == 0) {
+            throw new BusinessException(ErrorCode.FORBIDDEN_ERROR);
+        }
+        // 4. 查询当前用户
+        User loginUser = userService.getLoginUser(request);
+        if (loginUser == null) {
+            throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR);
+        }
+        // 5.调用接口
+        String result = interfaceInfoService.invokeInterface(interfaceInfo, loginUser.getId());
+        return ResultUtils.success(result);
     }
 
 }

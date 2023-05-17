@@ -12,7 +12,7 @@ import java.util.Map;
  * @from <a href="https://yupi.icu">编程导航知识星球</a>
  */
 @Data
-public class InterfaceInfoInvokeRequest implements Serializable {
+public class InterfaceInfoAdminInvokeRequest implements Serializable {
 
     /**
      * 调用者id

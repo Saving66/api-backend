@@ -1,4 +1,4 @@
-package com.yupi.springbootinit.utils;
+package com.yupi.springbootinit.model.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,6 +12,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RequestHeader {
+
+    /**
+     * 请求头名称
+     */
+    private String requestHeaderKey;
 
     /**
      * 请求头值

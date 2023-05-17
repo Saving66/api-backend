@@ -1,4 +1,4 @@
-package com.yupi.springbootinit.utils;
+package com.saving.clientsdk.model.entry;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,6 +12,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ResponseHeader {
+
+    /**
+     * 响应头名称
+     */
+    private String responseHeaderKey;
 
     /**
      * 响应头值

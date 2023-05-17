@@ -19,8 +19,8 @@ public class NameController {
         return "GET 你的名字是" + name;
     }
 
-    @PostMapping("/")
-    public String getNameByPost(@RequestParam String name) {
+    @PostMapping
+    public String getNameByPost(@RequestBody String name) {
         return "POST 你的名字是" + name;
     }
 
