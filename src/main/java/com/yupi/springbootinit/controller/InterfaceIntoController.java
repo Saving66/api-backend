@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.gson.Gson;
 import com.saving.clientsdk.client.ApiClient;
+import com.saving.validjsonsdk.utils.ValidRequestParamsUtil;
 import com.yupi.springbootinit.annotation.AuthCheck;
 import com.yupi.springbootinit.common.BaseResponse;
 import com.yupi.springbootinit.common.ErrorCode;
@@ -25,6 +26,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.io.IOException;
 import java.util.List;
 
 import static com.yupi.springbootinit.constant.CommonConstant.SORT_ORDER_ASC;
@@ -49,6 +52,9 @@ public class InterfaceIntoController {
     @Resource
     private ApiClient client;
 
+    @Resource
+    private ValidRequestParamsUtil validRequestParamsUtil;
+
     private final static Gson GSON = new Gson();
 
     // region 增删改查
@@ -62,6 +68,7 @@ public class InterfaceIntoController {
      */
     @PostMapping("/add")
     public BaseResponse<Long> addInterfaceInfo(@RequestBody InterfaceInfoAddRequest interfaceInfoAddRequest, HttpServletRequest request) {
+        // 1. 验证传入参数
         if (interfaceInfoAddRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
@@ -156,23 +163,19 @@ public class InterfaceIntoController {
      */
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     @PostMapping("/online")
-    public BaseResponse<InterfaceInfo> onlineInterfaceInfoById(@RequestBody IdRequest id, HttpServletRequest request) {
-        // 1.判断请求信息是否合理
-        if (id.getId() <= 0) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR);
-        }
-        // 2.判断接口是否存在
+    public BaseResponse<InterfaceInfo> onlineInterfaceInfoById(@Valid @RequestBody IdRequest id, HttpServletRequest request) {
+        // 1.判断接口是否存在
         InterfaceInfo interfaceInfo = interfaceInfoService.getById(id.getId());
         if (interfaceInfo == null) {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
         }
-        // 3.判断接口是否可以可以调用
+        // 2.判断接口是否可以可以调用
         User loginUser = userService.getLoginUser(request);
         boolean vaildUse = interfaceInfoService.isVaildUse(interfaceInfo);
         if (!vaildUse) {
             throw new BusinessException(ErrorCode.SYSTEM_ERROR);
         }
-        // 4.上线
+        // 3.上线
         interfaceInfo.setStatus(1);
         boolean update = interfaceInfoService.updateById(interfaceInfo);
         return update == true ? ResultUtils.success(interfaceInfo) : ResultUtils.error(ErrorCode.OPERATION_ERROR);
@@ -319,9 +322,9 @@ public class InterfaceIntoController {
      * @return
      */
     @PostMapping("/invoke")
-    public BaseResponse<String> invokeInterfaceInfo(@RequestBody InterfaceInfoUserInvokeRequest invokeRequest, HttpServletRequest request) {
+    public BaseResponse<String> invokeInterfaceInfo(@Valid @RequestBody InterfaceInfoUserInvokeRequest invokeRequest, HttpServletRequest request) throws IOException {
         // 1.判断请求参数是否合理
-        if (invokeRequest == null || "".equals(invokeRequest.getRequestParams())) {
+        if (invokeRequest == null || "".equals(invokeRequest.getUserRequestParams())) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         // 2.判断接口是否存在
@@ -339,7 +342,7 @@ public class InterfaceIntoController {
             throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR);
         }
         // 5.调用接口
-        String result = interfaceInfoService.invokeInterface(interfaceInfo, loginUser.getId());
+        String result = interfaceInfoService.invokeInterface(interfaceInfo, loginUser.getId(), invokeRequest.getUserRequestParams());
         return ResultUtils.success(result);
     }
 

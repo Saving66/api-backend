@@ -92,3 +92,9 @@ api:
   client:
     access-key: saving
     secret-key: abcdefgh
+
+validjson:
+  schema-url: /Users/saving/Developer/Java/schema/
+
+
+

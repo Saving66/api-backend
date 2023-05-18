@@ -64,14 +64,58 @@ public class ApiClient {
         return result;
     }
 
-    public BaseResponse invokeApi(InvokeRequest invokeRequest) {
-
+    /**
+     * 功能描述：
+     * 管理员调用接口
+     * @param invokeRequest
+     * @return BaseResponse
+     * @author Saving
+     * @date 2023/5/17 10:24
+     */
+    public BaseResponse invokeAdminApi(InvokeRequest invokeRequest) {
         // 1. 生成签名和请求头
-        String requestHeader = invokeRequest.getRequestHeader();
-        Map<String, String> map = JSONUtil.toBean(requestHeader, Map.class);
-        Map<String, String> headerMap2 = getHeaderMap(String.valueOf(invokeRequest.getUserId()), map);
+        Map requestHeader = invokeRequest.getRequestHeader();
+        Map<String, String> headerMap2 = getHeaderMap(String.valueOf(invokeRequest.getUserId()), requestHeader);
         // 2. 发送请求
-        String method = invokeRequest.getMethod( );
+        String method = invokeRequest.getMethod();
+        HttpRequest request;
+        switch (method.toUpperCase()) {
+            case "GET":
+                request = HttpRequest.get(invokeRequest.getUrl());
+                break;
+            case "POST":
+                request = HttpRequest.post(invokeRequest.getUrl());
+                break;
+            case "PUT":
+                request = HttpRequest.put(invokeRequest.getUrl());
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid HTTP method: " + method);
+        }
+        String requestParams = invokeRequest.getRequestParams();
+        String result = request
+                .addHeaders(headerMap2)
+                .body(requestParams).execute().body();
+        // 3. 返回结果
+        return ResultUtils.success(result);
+    }
+
+
+
+    /**
+     * 功能描述：
+     * 用户调用接口
+     * @param invokeRequest
+     * @return BaseResponse
+     * @author Saving
+     * @date 2023/5/17 10:25
+     */
+    public BaseResponse invokeUserApi(InvokeRequest invokeRequest) {
+        // 1. 生成签名和请求头
+        Map requestHeader = invokeRequest.getRequestHeader();
+        Map<String, String> headerMap2 = getHeaderMap(String.valueOf(invokeRequest.getUserId()), requestHeader);
+        // 2. 发送请求
+        String method = invokeRequest.getMethod();
         HttpRequest request;
         switch (method.toUpperCase()) {
             case "GET":

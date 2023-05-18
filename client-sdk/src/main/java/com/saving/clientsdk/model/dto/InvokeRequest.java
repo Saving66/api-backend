@@ -2,13 +2,14 @@ package com.saving.clientsdk.model.dto;
 
 import lombok.Data;
 
+import java.util.Map;
+
 @Data
 public class InvokeRequest {
 
     /**
      * 调用者id
      */
-
     private Long userId;
 
     /**
@@ -19,7 +20,7 @@ public class InvokeRequest {
     /**
      * 请求头
      */
-    private String requestHeader;
+    private Map requestHeader;
 
     /**
      * 请求类型

@@ -6,24 +6,22 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.saving.clientsdk.client.ApiClient;
 import com.saving.clientsdk.common.BaseResponse;
 import com.saving.clientsdk.model.dto.InvokeRequest;
+import com.saving.validjsonsdk.utils.ValidRequestParamsUtil;
 import com.yupi.springbootinit.common.ErrorCode;
 import com.yupi.springbootinit.exception.BusinessException;
 import com.yupi.springbootinit.exception.ThrowUtils;
 import com.yupi.springbootinit.mapper.InterfaceInfoMapper;
 import com.yupi.springbootinit.model.dto.interfaceInfo.InterfaceInfoAddRequest;
-import com.yupi.springbootinit.model.entity.InterfaceInfo;
-import com.yupi.springbootinit.model.entity.User;
+import com.yupi.springbootinit.model.entity.*;
 import com.yupi.springbootinit.service.InterfaceInfoService;
 import com.yupi.springbootinit.service.UserService;
-import com.yupi.springbootinit.model.entity.RequestHeader;
-import com.yupi.springbootinit.model.entity.RequestParam;
-import com.yupi.springbootinit.model.entity.ResponseHeader;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -42,6 +40,9 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
 
     @Resource
     private ApiClient apiClient;
+
+    @Resource
+    private ValidRequestParamsUtil validRequestParamsUtil;
 
     @Override
     public void validInterfaceInfo(InterfaceInfo interfaceInfo, boolean add) {
@@ -71,11 +72,14 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
         Map<String, String> requestHeaderMap = requestHeader.stream().collect(Collectors.toMap(RequestHeader::getRequestHeaderKey, RequestHeader::getRequestHeaderValue));
         Map<String, String> responseHeaderMap = responseHeader.stream().collect(Collectors.toMap(ResponseHeader::getResponseHeaderKey, ResponseHeader::getResponseHeaderValue));
         // 根据类型，转换为对应的值
-        requestParamMap = transferValue(requestParamMap);
+//        requestParamMap = transferValue(requestParamMap);
         // 3. 参数转换为Json形式
         String requestParamsJsonStr = JSONUtil.toJsonStr(requestParamMap);
         String requestHeaderJsonStr = JSONUtil.toJsonStr(requestHeaderMap);
         String responseHeaderJsonStr = JSONUtil.toJsonStr(responseHeaderMap);
+        // 4. 根据请求参数创建schema
+        validRequestParamsUtil.createJsonSchema(requestParamsJsonStr, interfaceInfo.getName());
+        // 5. 保存接口信息
         interfaceInfo.setRequestParams(requestParamsJsonStr);
         interfaceInfo.setRequestHeader(requestHeaderJsonStr);
         interfaceInfo.setResponseHeader(responseHeaderJsonStr);
@@ -118,23 +122,45 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
      */
     @Override
     public boolean isVaildUse(InterfaceInfo interfaceInfo) {
-        // TODO 校验是否可以使用
-        // 1. 根据接口信息设置请求
-        InvokeRequest target = new InvokeRequest();
-        BeanUtil.copyProperties(interfaceInfo, target);
-        // 2. 调用接口
-        BaseResponse baseResponse = apiClient.invokeApi(target);
-        // 3.输出结果
-        System.out.println(baseResponse);
-        return false;
+//        // 1. 根据接口信息设置请求
+//        InvokeRequest target = new InvokeRequest();
+//        BeanUtil.copyProperties(interfaceInfo, target);
+//        // 2. 调用接口
+//        BaseResponse baseResponse = apiClient.invokeAdminApi(target);
+//        // 3.输出结果
+//        System.out.println(baseResponse);
+//        if (baseResponse.getCode() != 0) {
+//            return false;
+//        }
+        return true;
     }
 
+    /**
+     * 功能描述：
+     * 用户调用接口
+     * @param interfaceInfo
+     * @param userId
+     * @param requestParams
+     * @return String
+     * @author Saving
+     * @date 2023/5/17 10:19
+     */
     @Override
-    public String invokeInterface(InterfaceInfo interfaceInfo, Long userId) {
+    public String invokeInterface(InterfaceInfo interfaceInfo, Long userId, String requestParams) throws IOException {
         // 1.根据调用接口用户初始化调用客户端
         User user = userService.getById(userId);
         ApiClient userApiClient = new ApiClient(user.getAccessKey(), user.getSecretKey());
-
+        // 2.验证请求参数
+        boolean valid = validRequestParamsUtil.valid(requestParams, interfaceInfo.getName());
+        if (!valid) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        // 3.根据接口信息设置请求
+        InvokeRequest target = new InvokeRequest();
+        BeanUtil.copyProperties(interfaceInfo, target);
+        target.setRequestParams(requestParams);
+        // 4.调用接口
+        BaseResponse baseResponse = userApiClient.invokeUserApi(target);
         return null;
     }
 }

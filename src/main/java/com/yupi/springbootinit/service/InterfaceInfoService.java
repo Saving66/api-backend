@@ -5,6 +5,7 @@ import com.yupi.springbootinit.model.dto.interfaceInfo.InterfaceInfoAddRequest;
 import com.yupi.springbootinit.model.entity.InterfaceInfo;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 
 /**
 * @author saving
@@ -25,5 +26,5 @@ public interface InterfaceInfoService extends IService<InterfaceInfo> {
 
     boolean isVaildUse(InterfaceInfo interfaceInfo);
 
-    String invokeInterface(InterfaceInfo interfaceInfo, Long userId);
+    String invokeInterface(InterfaceInfo interfaceInfo, Long userId, String requestParams) throws IOException;
 }
