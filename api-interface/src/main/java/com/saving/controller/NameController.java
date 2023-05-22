@@ -3,6 +3,7 @@ package com.saving.controller;
 import cn.hutool.json.JSONUtil;
 import com.saving.clientsdk.model.entry.User;
 import com.saving.clientsdk.utils.SignUtil;
+import com.saving.model.entry.Stu;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -48,5 +49,10 @@ public class NameController {
             throw new RuntimeException("无权限");
         }
         return "POST 用户名字是" + user.getUsername();
+    }
+
+    @GetMapping("/stu")
+    public String getStuNameByGet(@RequestBody Stu stu) {
+        return "StuGet: 你的名字是" + stu.getName();
     }
 }

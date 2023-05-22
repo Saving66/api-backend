@@ -20,7 +20,7 @@ public class InvokeRequest {
     /**
      * 请求头
      */
-    private Map requestHeader;
+    private Map<String, String> requestHeader;
 
     /**
      * 请求类型
@@ -35,6 +35,6 @@ public class InvokeRequest {
     /**
      * 响应头
      */
-    private String responseHeader;
+    private Map<String, String> responseHeader;
 
 }

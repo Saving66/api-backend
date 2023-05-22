@@ -1,8 +1,8 @@
 package com.yupi.springbootinit.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.saving.clientsdk.client.ApiClient;
 import com.saving.clientsdk.common.BaseResponse;
 import com.saving.clientsdk.model.dto.InvokeRequest;
@@ -146,7 +146,7 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
      * @date 2023/5/17 10:19
      */
     @Override
-    public String invokeInterface(InterfaceInfo interfaceInfo, Long userId, String requestParams) throws IOException {
+    public com.yupi.springbootinit.common.BaseResponse invokeInterface(InterfaceInfo interfaceInfo, Long userId, String requestParams) throws IOException {
         // 1.根据调用接口用户初始化调用客户端
         User user = userService.getById(userId);
         ApiClient userApiClient = new ApiClient(user.getAccessKey(), user.getSecretKey());
@@ -157,11 +157,44 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
         }
         // 3.根据接口信息设置请求
         InvokeRequest target = new InvokeRequest();
-        BeanUtil.copyProperties(interfaceInfo, target);
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, String> requestHeaderMap = objectMapper.readValue(interfaceInfo.getRequestHeader(), Map.class);
+        Map<String, String> responseHeaderMap = objectMapper.readValue(interfaceInfo.getResponseHeader(), Map.class);
+        target.setUrl(interfaceInfo.getUrl());
+        target.setUserId(userId);
+        target.setMethod(interfaceInfo.getMethod());
+        target.setRequestHeader(requestHeaderMap);
+        target.setResponseHeader(responseHeaderMap);
         target.setRequestParams(requestParams);
         // 4.调用接口
         BaseResponse baseResponse = userApiClient.invokeUserApi(target);
-        return null;
+        com.yupi.springbootinit.common.BaseResponse baseResponse1 = new com.yupi.springbootinit.common.BaseResponse(baseResponse.getCode(), baseResponse.getData(), baseResponse.getMessage());
+        return baseResponse1;
+    }
+
+    public InterfaceInfo toInterfaceInfo() {
+        InterfaceInfo interfaceInfo = new InterfaceInfo();
+
+        // Not mapped InterfaceInfoServiceImpl fields:
+        // userService
+        // apiClient
+        // validRequestParamsUtil
+
+        // Not mapped InterfaceInfo fields:
+        // id
+        // name
+        // description
+        // url
+        // requestHeader
+        // responseHeader
+        // status
+        // method
+        // requestParams
+        // userId
+        // createTime
+        // updateTime
+        // isDelete
+        return interfaceInfo;
     }
 }
 

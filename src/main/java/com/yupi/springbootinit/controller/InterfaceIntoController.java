@@ -342,8 +342,8 @@ public class InterfaceIntoController {
             throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR);
         }
         // 5.调用接口
-        String result = interfaceInfoService.invokeInterface(interfaceInfo, loginUser.getId(), invokeRequest.getUserRequestParams());
-        return ResultUtils.success(result);
+        BaseResponse baseResponse = interfaceInfoService.invokeInterface(interfaceInfo, loginUser.getId(), invokeRequest.getUserRequestParams());
+        return baseResponse;
     }
 
 }

@@ -1,6 +1,7 @@
 package com.yupi.springbootinit.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.yupi.springbootinit.common.BaseResponse;
 import com.yupi.springbootinit.model.dto.interfaceInfo.InterfaceInfoAddRequest;
 import com.yupi.springbootinit.model.entity.InterfaceInfo;
 
@@ -26,5 +27,5 @@ public interface InterfaceInfoService extends IService<InterfaceInfo> {
 
     boolean isVaildUse(InterfaceInfo interfaceInfo);
 
-    String invokeInterface(InterfaceInfo interfaceInfo, Long userId, String requestParams) throws IOException;
+    BaseResponse invokeInterface(InterfaceInfo interfaceInfo, Long userId, String requestParams) throws IOException;
 }
